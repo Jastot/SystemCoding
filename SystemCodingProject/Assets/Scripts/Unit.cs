@@ -1,6 +1,5 @@
-﻿using System;
+﻿
 using System.Collections;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -9,15 +8,13 @@ public class Unit : MonoBehaviour
 {
     private int _health = 36;
     private int _minHeal = 5;
-    private CancellationTokenSource cancellationToken = new CancellationTokenSource();
+    private CancellationTokenSource _cancellationToken;
     public void Start()
     {
-        
+        _cancellationToken = new CancellationTokenSource();
         //UnitAsyncTasks();
         //ReceiveHealing();
-        Task task1 = Task.Run(()=>UnitAsyncTask1(cancellationToken.Token));
-        Task task2 = Task.Run(()=>UnitAsyncTask2(cancellationToken.Token));
-        Debug.Log(Task.Run(() => WhatTaskFasterAsync(cancellationToken.Token, task1, task2)).Result);
+        SomeTaskWaiter();
     }
 
     public void ReceiveHealing()
@@ -25,35 +22,52 @@ public class Unit : MonoBehaviour
         StartCoroutine(HealingCoroutine());
     }
 
+    private async void SomeTaskWaiter()
+    {
+        
+        Task task1 = new Task(()=>UnitAsyncTask1(_cancellationToken.Token));
+        Task task2 = new Task(()=>UnitAsyncTask2(_cancellationToken.Token));       
+        
+        Debug.Log("Result: "+ await Task.Run(()=>WhatTaskFasterAsync(_cancellationToken.Token, task1, task2)));
+        _cancellationToken.Cancel();
+        _cancellationToken.Dispose();
+    }
+    
     private async void UnitAsyncTasks()
     {
-        CancellationTokenSource cancellationToken = new CancellationTokenSource();
-        Task task1 = new Task(()=>UnitAsyncTask1(cancellationToken.Token));
-        Task task2 = new Task(()=>UnitAsyncTask2(cancellationToken.Token));
+        Task task1 = Task.Run(()=>UnitAsyncTask1(_cancellationToken.Token));
+        Task task2 = Task.Run(()=>UnitAsyncTask2(_cancellationToken.Token));
         await Task.WhenAll(task1, task2);
     }
     
-    private  async Task UnitAsyncTask1(CancellationToken cancellationToken)
+    private  async void UnitAsyncTask1(CancellationToken cancellationToken)
     {
-        await Task.Delay(1000);
-        if (cancellationToken.IsCancellationRequested)
+        Debug.Log("Task 1 starts");
+        for (int i = 0; i < 100; i++)
         {
-            return;
+            await Task.Delay(10);
+            if (cancellationToken.IsCancellationRequested)
+            {
+                Debug.Log("token 1");
+                return;
+            }
         }
         Debug.Log("Task 1 ends");
     }
     
-    private  async Task UnitAsyncTask2(CancellationToken cancellationToken )
+    private async void UnitAsyncTask2(CancellationToken cancellationToken )
     {
+        Debug.Log("Task 2 starts");
         int count = 0;
-        while (count<60)
+        while (count<132323240)
         {
-            await Task.Yield();
-            count++;
             if (cancellationToken.IsCancellationRequested)
             {
+                Debug.Log("token 2");
                 return;
             }
+            await Task.Yield();
+            count++;
         }
         Debug.Log("Task 2 ends");
       
@@ -61,17 +75,17 @@ public class Unit : MonoBehaviour
 
     public async Task<bool> WhatTaskFasterAsync(CancellationToken ctx,Task task1,Task task2)
     {
+        task1.Start();
+        task2.Start();
+        // по логике все верно, но почему-то whenAny всегда возвращает task2
+        // причем без разницы завершен он или нет.
+        // 
         Task result = await Task.WhenAny(task1, task2);
-        cancellationToken.Cancel();
-        cancellationToken.Dispose();
-        if (result==task1)
-        {
+        await result;
+        if (result == task1 && !ctx.IsCancellationRequested)
             return true;
-        }
         else
-        {
             return false;
-        }
     }
     
     IEnumerator HealingCoroutine()
