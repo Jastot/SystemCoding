@@ -15,6 +15,6 @@ EditorBuildSettings:
     path: Assets/Scenes/Offline.unity
     guid: 46e9092d612c51c4391d4291e700e8d1
   - enabled: 1
-    path: Assets/6/Main.unity
+    path: Assets/5/Main.unity
     guid: 4c439dcfe68ba7448be9783d84c88742
   m_configObjects: {}

@@ -46,9 +46,9 @@ namespace Characters
 
         public override void OnStartAuthority()
         {
-            /*playerNameSetter = GameObject.FindObjectOfType<TMP_InputField>();
+            playerNameSetter = GameObject.FindObjectOfType<TMP_InputField>();
             PlayerName = playerNameSetter.text;
-            NetworkManager.singleton.SendMessage("SetName",playerNameSetter.text);*/
+            NetworkManager.singleton.SendMessage("SetName",playerNameSetter.text);
             rb = GetComponent<Rigidbody>();
             if (rb == null)
             {
