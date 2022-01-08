@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Main;
 using Mechanics;
@@ -11,13 +12,17 @@ namespace Characters
 {
     public class ShipController : NetworkMovableObject
     {
-        
+        public event Action<string> ColisionDetected;
         public TMP_InputField playerNameSetter;
         /*public override void OnStartClient()
         {
             
         }*/
-        
+        private void OnTriggerEnter(Collider other)
+        {
+            ColisionDetected.Invoke(playerName);
+        }
+
         public string PlayerName
         {
             get => playerName;
@@ -48,7 +53,6 @@ namespace Characters
         {
             playerNameSetter = GameObject.FindObjectOfType<TMP_InputField>();
             PlayerName = playerNameSetter.text;
-            NetworkManager.singleton.SendMessage("SetName",playerNameSetter.text);
             rb = GetComponent<Rigidbody>();
             if (rb == null)
             {
