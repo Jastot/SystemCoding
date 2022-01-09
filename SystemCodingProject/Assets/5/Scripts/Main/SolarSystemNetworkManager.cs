@@ -2,6 +2,9 @@ using System.Collections;
 using Characters;
 using Mechanics;
 using TMPro;
+using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
+using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Networking.NetworkSystem;
@@ -13,7 +16,7 @@ namespace Main
         [SerializeField] private TMP_InputField _playersName;
         public override void OnServerSceneChanged(string sceneName)
         {
-            base.OnServerSceneChanged(sceneName);
+            //base.OnServerSceneChanged(sceneName);
             Debug.Log("OnServerSceneChanged");
             CreateCustomSolarSystem();
         }
@@ -35,7 +38,7 @@ namespace Main
                     ship.PlayerName = playerName;
                 }
             }
-            
+           
             NetworkServer.AddPlayerForConnection(conn, player, playerControllerId);
         }
 
@@ -44,7 +47,7 @@ namespace Main
             foreach (var networkId in ClientScene.objects.Values)
             {
                 if(networkId.gameObject.name==name && networkId.isClient)
-                    networkId.gameObject.SetActive(false);
+                    NetworkServer.Destroy(networkId.gameObject);
             }
         }
         public override void OnClientConnect(NetworkConnection conn)
@@ -67,6 +70,19 @@ namespace Main
                     shipC.PlayerName =_playersName.text;
                 }
             }
+
+            foreach (var c in ClientScene.objects.Values)
+            {
+                var planet = c.GetComponent<PlanetOrbit>();
+                if (planet)
+                {
+                    var obj = planet.gameObject;
+                    obj.name = planet.Name;
+                    var mat = Resources.LoadAll<Material>("Materials/");
+                    planet.GetComponent<MeshRenderer>().material = mat[planet.materialNumber];
+                    obj.transform.localScale = planet.scale;
+                }
+            }
         }
 
         private void CreateCustomSolarSystem()
@@ -77,22 +93,28 @@ namespace Main
             {
                 var planet = Instantiate(planetPrefab,
                     new Vector3(planetStruct.Position.x,0,planetStruct.Position.y), Quaternion.identity);
-                var material = planet.GetComponent<MeshRenderer>();
-                var collider = planet.GetComponent<SphereCollider>();
-                var rigidbody = planet.AddComponent<Rigidbody>();
-                collider.isTrigger = true;
                 var orbit = planet.GetComponent<PlanetOrbit>();
-                rigidbody.useGravity = false;
-                planet.AddComponent<NetworkProximityChecker>();
                 planet.name = planetStruct.PlanetName;
                 planet.transform.localScale = new Vector3(planetStruct.Radius,planetStruct.Radius,planetStruct.Radius);
-                orbit.PlanetOrbitData = planetStruct.PlanetOrbitData;
+
+                orbit.startPos = new Vector3(planetStruct.Position.x, 0, planetStruct.Position.y);
+                orbit.scale = planet.transform.localScale;
+                orbit.offsetCos = planetStruct.PlanetOrbitData.offsetCos;
+                orbit.offsetSin = planetStruct.PlanetOrbitData.offsetSin;
+                orbit.smoothTime = planetStruct.PlanetOrbitData.smoothTime;
                 orbit.rotationSpeed = planetStruct.Speed;
-                material.material = planetStruct.Material;
+                orbit.materialNumber = planetStruct.Material; 
+                orbit.Name = planet.name;
+                var mat = Resources.LoadAll<Material>("Materials/");
+                planet.GetComponent<MeshRenderer>().material = mat[planetStruct.Material];
                 NetworkServer.Spawn(planet);
             }
         }
 
+        public override void OnServerReady(NetworkConnection conn)
+        {
+        }
+        
         public override void OnClientSceneChanged(NetworkConnection conn)
         {
         }

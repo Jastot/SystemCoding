@@ -85,8 +85,7 @@ public class GenerationWindow: EditorWindow
             GL.Begin(GL.LINES);
             DrawPlanet(layoutRectangle,Color.yellow,new PlanetStruct()
             {
-                PlanetOrbitData = null,Position = new Vector3(0,0,0),Speed = 0,Radius = 100,
-                Material = null
+                PlanetOrbitData = null,Position = new Vector3(0,0,0),Speed = 0,Radius = 100
             });
             foreach (var planetStruct in _mapData.PlanetStructs)
             {

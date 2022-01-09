@@ -1,18 +1,33 @@
 using Data;
 using Network;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace Mechanics
 {
     public class PlanetOrbit : NetworkMovableObject
     {
-        protected override float speed => PlanetOrbitData.smoothTime;
-        public PlanetOrbitData PlanetOrbitData;
+        [SyncVar]
+        public string Name;
+        protected override float speed => smoothTime;
+        [SyncVar]
+        public float smoothTime = .3f;
+        [SyncVar]
+        public float offsetSin = 1;
+        [SyncVar]
+        public float offsetCos = 1;
+        [SyncVar]
+        public int materialNumber;
+        [SyncVar]
+        public Vector3 scale;
+        [SyncVar] 
+        public Vector3 startPos;
+        
         public Transform aroundPoint;
-        [HideInInspector]
+        
         public float rotationSpeed;
-        [HideInInspector]
-        public float circleInSecond = 1f;
+        
+        public float circleInSecond = 0.1f;
         
         private float dist;
         private float currentAng;
@@ -24,6 +39,8 @@ namespace Mechanics
         public void Start()
         {
             aroundPoint = FindObjectOfType<Solar>().transform;
+            transform.position = startPos;
+            circleInSecond = speed / 100f;
             if (isServer)
             {
                 dist = (transform.position - aroundPoint.position).magnitude;
@@ -37,10 +54,9 @@ namespace Mechanics
             {
                 return;
             }
-
             Vector3 p = aroundPoint.position;
-            p.x += Mathf.Sin(currentAng) * dist * PlanetOrbitData.offsetSin;
-            p.z += Mathf.Cos(currentAng) * dist * PlanetOrbitData.offsetCos;
+            p.x += Mathf.Sin(currentAng) * dist * offsetSin;
+            p.z += Mathf.Cos(currentAng) * dist * offsetCos;
             transform.position = p;
             currentRotationAngle += Time.deltaTime * rotationSpeed;
             currentRotationAngle = Mathf.Clamp(currentRotationAngle, 0, 361);

@@ -20,7 +20,7 @@ namespace Characters
         }*/
         private void OnTriggerEnter(Collider other)
         {
-            ColisionDetected.Invoke(playerName);
+            ColisionDetected?.Invoke(playerName);
         }
 
         public string PlayerName

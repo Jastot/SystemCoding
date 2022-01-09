@@ -10,7 +10,7 @@ namespace Main
     {
         public string PlanetName;
         public PlanetOrbitData PlanetOrbitData;
-        public Material Material;
+        public int Material;
         public Vector2 Position;
         public int Radius;
         public float Speed;

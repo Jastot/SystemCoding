@@ -15,7 +15,13 @@ MonoBehaviour:
   PlanetStructs:
   - PlanetName: "\u0417\u0435\u043C\u0435\u043B\u044F"
     PlanetOrbitData: {fileID: 11400000, guid: 8a64ab70c9c4d0f4ea469b220d45546a, type: 2}
-    Material: {fileID: 2100000, guid: 3c0495814b596e6429d447ac5aa0a72e, type: 2}
-    Position: {x: 100, y: 50}
+    Material: 1
+    Position: {x: 200, y: 200}
     Radius: 30
-    Speed: 10
+    Speed: 5
+  - PlanetName: "\u0428\u0430\u0440 \u0443\u0436\u0430\u0441\u0430"
+    PlanetOrbitData: {fileID: 11400000, guid: 8a64ab70c9c4d0f4ea469b220d45546a, type: 2}
+    Material: 3
+    Position: {x: -100, y: -100}
+    Radius: 10
+    Speed: 2
