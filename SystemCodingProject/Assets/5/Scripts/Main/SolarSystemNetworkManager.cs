@@ -46,8 +46,12 @@ namespace Main
         {
             foreach (var networkId in ClientScene.objects.Values)
             {
-                if(networkId.gameObject.name==name && networkId.isClient)
+                if (networkId.gameObject.name == name && networkId.isClient)
+                {
                     NetworkServer.Destroy(networkId.gameObject);
+                    networkId.GetComponent<ShipController>().ColisionDetected -= deletePlayer;
+                }
+                    
             }
         }
         public override void OnClientConnect(NetworkConnection conn)
@@ -61,7 +65,7 @@ namespace Main
 
         private IEnumerator SetClientParams()
         {
-            yield return new WaitForSeconds(1);
+            yield return new WaitForFixedUpdate();
             foreach (var c in ClientScene.localPlayers)
             {
                 var shipC = c.gameObject.GetComponent<ShipController>();

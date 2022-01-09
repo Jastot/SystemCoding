@@ -16,7 +16,7 @@ MonoBehaviour:
   - PlanetName: "\u0417\u0435\u043C\u0435\u043B\u044F"
     PlanetOrbitData: {fileID: 11400000, guid: 8a64ab70c9c4d0f4ea469b220d45546a, type: 2}
     Material: 1
-    Position: {x: 200, y: 200}
+    Position: {x: 100, y: 150}
     Radius: 30
     Speed: 5
   - PlanetName: "\u0428\u0430\u0440 \u0443\u0436\u0430\u0441\u0430"

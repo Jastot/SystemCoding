@@ -47,7 +47,7 @@ public class GenerationWindow: EditorWindow
     private Vector2 _scrollPosition;
     private void OnGUI()
     {
-        //_scrollPosition = GUILayout.BeginScrollView(_scrollPosition,false,true, GUILayout.ExpandWidth(true));
+       
         GUILayout.BeginHorizontal(EditorStyles.helpBox);
         _heigth = ReDrawGraphic();
         GUILayout.EndHorizontal();
@@ -64,11 +64,18 @@ public class GenerationWindow: EditorWindow
           
             _dataObjects.Update();
             _listRect.y = 400f;//_heigth+30;
+            
+            // _scrollPosition = GUILayout.BeginScrollView(_scrollPosition,
+            //     false,true, GUILayout.ExpandWidth(true));
+            
             _reorderableList.DoList(_listRect);
+           
+           // GUILayout.EndScrollView();
+           
             _dataObjects.ApplyModifiedProperties();
         }
         // EditorGUILayout.EndHorizontal();
-        //GUILayout.EndScrollView();
+        
         
     }
 
